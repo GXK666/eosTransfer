@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package general;
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+  info: {
+    version: "1.0";
+  };
+  external_docs: {
+    url: "https://git.cochain.io/cochain/chains";
+    description: "Cochain's stateless backend service for general usage api";
+  }
+  schemes: HTTPS;
+};
+
+// Refer to: github.com/gogo/protobuf/test/types/types.proto
+option (gogoproto.testgen_all) = true;
+option (gogoproto.populate_all) = true;
+option (gogoproto.benchgen_all) = true;
+
+// Enable custom Marshal method.
+option (gogoproto.marshaler_all) = true;
+// Enable custom Unmarshal method.
+option (gogoproto.unmarshaler_all) = true;
+// Enable custom Size method (Required by Marshal and Unmarshal).
+option (gogoproto.sizer_all) = true;
+// Enable registration with golang/protobuf for the grpc-gateway.
+option (gogoproto.goproto_registration) = true;
+// Enable generation of XXX_MessageName methods for grpc-go/status.
+option (gogoproto.messagename_all) = true;
+
+service Service {
+    rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse) {
+        option (google.api.http).get = "/v1/healthcheck";
+    }
+    rpc Version(VersionRequest) returns (VersionResponse) {
+        option (google.api.http).get = "/v1/version";
+    }
+    rpc TransferOut(TransferOutRequest) returns (TransferOutResponse) {
+        option (google.api.http) = {
+            post: "/v1/transfer_out"
+            body: '*'
+        };
+    }
+}
+
+message HealthCheckRequest {
+}
+message HealthCheckResponse {
+}
+
+message VersionRequest {}
+message VersionResponse {
+    string version = 1;
+}
+
+message TransferOutRequest{
+    string contract = 1;
+    string from = 2;
+    string to = 3;
+    string amount = 4;
+    string memo = 5;
+}
+message TransferOutResponse{
+    string txid = 1;
+}
+
