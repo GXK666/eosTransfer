@@ -27,4 +27,18 @@ post   /v1/transfer_out
 ```
 
 
-## 
+## 二、查询交易
+
+
+```
+post /v1/get_transfer"
+
+{
+    "txid": ""  # 64位交易id
+}
+
+# 返回结果:
+{
+   "status":"success"  # 'success' 'executed','soft_fail','hard_fail','delayed','expired','unknown'
+}
+```

@@ -47,6 +47,12 @@ service Service {
             body: '*'
         };
     }
+    rpc GetTransferStatus(GetTransferStatusRequest) returns (GetTransferStatusesponse) {
+        option (google.api.http) = {
+            post: "/v1/get_transfer"
+            body: '*'
+        };
+    }
 }
 
 message HealthCheckRequest {
@@ -70,3 +76,10 @@ message TransferOutResponse{
     string txid = 1;
 }
 
+message GetTransferStatusRequest{
+    string txid = 1;
+}
+
+message GetTransferStatusesponse{
+    string status = 1;
+}
