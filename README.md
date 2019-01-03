@@ -37,8 +37,9 @@ post /v1/get_transfer"
     "txid": ""  # 64位交易id
 }
 
-# 返回结果:
+
+# 返回结果:irreversible (打包成功且不可逆，大约在交易发出3分钟后查询进入此状态)， executed（交易打包成功但可逆）
 {
-   "status":"success"  # 'success' 'executed','soft_fail','hard_fail','delayed','expired','unknown'
+   "status":"irreversible"  # 'irreversible' 'executed','soft_fail','hard_fail','delayed','expired','unknown'
 }
 ```

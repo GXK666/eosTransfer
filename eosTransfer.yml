@@ -12,4 +12,7 @@ log:
 
 eosPrivateKeys: "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3,5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"  # "key1,key2,key3"
 
-eosNodeUrl: "https://fullnode.ccachain.info"
+
+chainsRpc:
+  endpoint: 127.0.0.1:8080
+  pemfile: /etc/cochain/payman/certs/chains_server.pem

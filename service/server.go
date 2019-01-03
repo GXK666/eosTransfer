@@ -1,10 +1,11 @@
 package service
 
 import (
-	"github.com/GXK666/eosTransfer/service/general"
-	"github.com/GXK666/eosTransfer/transfer"
 	"net/http"
 	"strings"
+
+	"github.com/GXK666/eosTransfer/service/general"
+	"github.com/GXK666/eosTransfer/transfer"
 
 	"crypto/tls"
 	"net"

@@ -47,7 +47,7 @@ service Service {
             body: '*'
         };
     }
-    rpc GetTransferStatus(GetTransferStatusRequest) returns (GetTransferStatusesponse) {
+    rpc GetTransferStatus(GetTransferStatusRequest) returns (GetTransferStatusResponse) {
         option (google.api.http) = {
             post: "/v1/get_transfer"
             body: '*'
@@ -80,6 +80,6 @@ message GetTransferStatusRequest{
     string txid = 1;
 }
 
-message GetTransferStatusesponse{
+message GetTransferStatusResponse{
     string status = 1;
 }

@@ -14,6 +14,32 @@
     "application/json"
   ],
   "paths": {
+    "/v1/get_transfer": {
+      "post": {
+        "operationId": "GetTransferStatus",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/generalGetTransferStatusResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/generalGetTransferStatusRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Service"
+        ]
+      }
+    },
     "/v1/healthcheck": {
       "get": {
         "operationId": "HealthCheck",
@@ -74,6 +100,22 @@
     }
   },
   "definitions": {
+    "generalGetTransferStatusRequest": {
+      "type": "object",
+      "properties": {
+        "txid": {
+          "type": "string"
+        }
+      }
+    },
+    "generalGetTransferStatusResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        }
+      }
+    },
     "generalHealthCheckResponse": {
       "type": "object"
     },

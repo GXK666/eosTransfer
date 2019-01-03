@@ -14,6 +14,8 @@ It has these top-level messages:
 	VersionResponse
 	TransferOutRequest
 	TransferOutResponse
+	GetTransferStatusRequest
+	GetTransferStatusResponse
 */
 package general
 
@@ -613,6 +615,198 @@ func BenchmarkTransferOutResponseProtoUnmarshal(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
+func TestGetTransferStatusRequestProto(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedGetTransferStatusRequest(popr, false)
+	dAtA, err := proto.Marshal(p)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	msg := &GetTransferStatusRequest{}
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	littlefuzz := make([]byte, len(dAtA))
+	copy(littlefuzz, dAtA)
+	for i := range dAtA {
+		dAtA[i] = byte(popr.Intn(256))
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+	if len(littlefuzz) > 0 {
+		fuzzamount := 100
+		for i := 0; i < fuzzamount; i++ {
+			littlefuzz[popr.Intn(len(littlefuzz))] = byte(popr.Intn(256))
+			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
+		}
+		// shouldn't panic
+		_ = proto.Unmarshal(littlefuzz, msg)
+	}
+}
+
+func TestGetTransferStatusRequestMarshalTo(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedGetTransferStatusRequest(popr, false)
+	size := p.Size()
+	dAtA := make([]byte, size)
+	for i := range dAtA {
+		dAtA[i] = byte(popr.Intn(256))
+	}
+	_, err := p.MarshalTo(dAtA)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	msg := &GetTransferStatusRequest{}
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	for i := range dAtA {
+		dAtA[i] = byte(popr.Intn(256))
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+}
+
+func BenchmarkGetTransferStatusRequestProtoMarshal(b *testing.B) {
+	popr := rand.New(rand.NewSource(616))
+	total := 0
+	pops := make([]*GetTransferStatusRequest, 10000)
+	for i := 0; i < 10000; i++ {
+		pops[i] = NewPopulatedGetTransferStatusRequest(popr, false)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		dAtA, err := proto.Marshal(pops[i%10000])
+		if err != nil {
+			panic(err)
+		}
+		total += len(dAtA)
+	}
+	b.SetBytes(int64(total / b.N))
+}
+
+func BenchmarkGetTransferStatusRequestProtoUnmarshal(b *testing.B) {
+	popr := rand.New(rand.NewSource(616))
+	total := 0
+	datas := make([][]byte, 10000)
+	for i := 0; i < 10000; i++ {
+		dAtA, err := proto.Marshal(NewPopulatedGetTransferStatusRequest(popr, false))
+		if err != nil {
+			panic(err)
+		}
+		datas[i] = dAtA
+	}
+	msg := &GetTransferStatusRequest{}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		total += len(datas[i%10000])
+		if err := proto.Unmarshal(datas[i%10000], msg); err != nil {
+			panic(err)
+		}
+	}
+	b.SetBytes(int64(total / b.N))
+}
+
+func TestGetTransferStatusResponseProto(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedGetTransferStatusResponse(popr, false)
+	dAtA, err := proto.Marshal(p)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	msg := &GetTransferStatusResponse{}
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	littlefuzz := make([]byte, len(dAtA))
+	copy(littlefuzz, dAtA)
+	for i := range dAtA {
+		dAtA[i] = byte(popr.Intn(256))
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+	if len(littlefuzz) > 0 {
+		fuzzamount := 100
+		for i := 0; i < fuzzamount; i++ {
+			littlefuzz[popr.Intn(len(littlefuzz))] = byte(popr.Intn(256))
+			littlefuzz = append(littlefuzz, byte(popr.Intn(256)))
+		}
+		// shouldn't panic
+		_ = proto.Unmarshal(littlefuzz, msg)
+	}
+}
+
+func TestGetTransferStatusResponseMarshalTo(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedGetTransferStatusResponse(popr, false)
+	size := p.Size()
+	dAtA := make([]byte, size)
+	for i := range dAtA {
+		dAtA[i] = byte(popr.Intn(256))
+	}
+	_, err := p.MarshalTo(dAtA)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	msg := &GetTransferStatusResponse{}
+	if err := proto.Unmarshal(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	for i := range dAtA {
+		dAtA[i] = byte(popr.Intn(256))
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+}
+
+func BenchmarkGetTransferStatusResponseProtoMarshal(b *testing.B) {
+	popr := rand.New(rand.NewSource(616))
+	total := 0
+	pops := make([]*GetTransferStatusResponse, 10000)
+	for i := 0; i < 10000; i++ {
+		pops[i] = NewPopulatedGetTransferStatusResponse(popr, false)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		dAtA, err := proto.Marshal(pops[i%10000])
+		if err != nil {
+			panic(err)
+		}
+		total += len(dAtA)
+	}
+	b.SetBytes(int64(total / b.N))
+}
+
+func BenchmarkGetTransferStatusResponseProtoUnmarshal(b *testing.B) {
+	popr := rand.New(rand.NewSource(616))
+	total := 0
+	datas := make([][]byte, 10000)
+	for i := 0; i < 10000; i++ {
+		dAtA, err := proto.Marshal(NewPopulatedGetTransferStatusResponse(popr, false))
+		if err != nil {
+			panic(err)
+		}
+		datas[i] = dAtA
+	}
+	msg := &GetTransferStatusResponse{}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		total += len(datas[i%10000])
+		if err := proto.Unmarshal(datas[i%10000], msg); err != nil {
+			panic(err)
+		}
+	}
+	b.SetBytes(int64(total / b.N))
+}
+
 func TestHealthCheckRequestJSON(t *testing.T) {
 	seed := time.Now().UnixNano()
 	popr := rand.New(rand.NewSource(seed))
@@ -713,6 +907,42 @@ func TestTransferOutResponseJSON(t *testing.T) {
 		t.Fatalf("seed = %d, err = %v", seed, err)
 	}
 	msg := &TransferOutResponse{}
+	err = jsonpb.UnmarshalString(jsondata, msg)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
+	}
+}
+func TestGetTransferStatusRequestJSON(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedGetTransferStatusRequest(popr, true)
+	marshaler := jsonpb.Marshaler{}
+	jsondata, err := marshaler.MarshalToString(p)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	msg := &GetTransferStatusRequest{}
+	err = jsonpb.UnmarshalString(jsondata, msg)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Json Equal %#v", seed, msg, p)
+	}
+}
+func TestGetTransferStatusResponseJSON(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedGetTransferStatusResponse(popr, true)
+	marshaler := jsonpb.Marshaler{}
+	jsondata, err := marshaler.MarshalToString(p)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	msg := &GetTransferStatusResponse{}
 	err = jsonpb.UnmarshalString(jsondata, msg)
 	if err != nil {
 		t.Fatalf("seed = %d, err = %v", seed, err)
@@ -889,6 +1119,62 @@ func TestTransferOutResponseProtoCompactText(t *testing.T) {
 	}
 }
 
+func TestGetTransferStatusRequestProtoText(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedGetTransferStatusRequest(popr, true)
+	dAtA := proto.MarshalTextString(p)
+	msg := &GetTransferStatusRequest{}
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+}
+
+func TestGetTransferStatusRequestProtoCompactText(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedGetTransferStatusRequest(popr, true)
+	dAtA := proto.CompactTextString(p)
+	msg := &GetTransferStatusRequest{}
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+}
+
+func TestGetTransferStatusResponseProtoText(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedGetTransferStatusResponse(popr, true)
+	dAtA := proto.MarshalTextString(p)
+	msg := &GetTransferStatusResponse{}
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+}
+
+func TestGetTransferStatusResponseProtoCompactText(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedGetTransferStatusResponse(popr, true)
+	dAtA := proto.CompactTextString(p)
+	msg := &GetTransferStatusResponse{}
+	if err := proto.UnmarshalText(dAtA, msg); err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	if !p.Equal(msg) {
+		t.Fatalf("seed = %d, %#v !Proto %#v", seed, msg, p)
+	}
+}
+
 func TestHealthCheckRequestGoString(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedHealthCheckRequest(popr, false)
@@ -957,6 +1243,32 @@ func TestTransferOutRequestGoString(t *testing.T) {
 func TestTransferOutResponseGoString(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedTransferOutResponse(popr, false)
+	s1 := p.GoString()
+	s2 := fmt.Sprintf("%#v", p)
+	if s1 != s2 {
+		t.Fatalf("GoString want %v got %v", s1, s2)
+	}
+	_, err := parser.ParseExpr(s1)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+func TestGetTransferStatusRequestGoString(t *testing.T) {
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
+	p := NewPopulatedGetTransferStatusRequest(popr, false)
+	s1 := p.GoString()
+	s2 := fmt.Sprintf("%#v", p)
+	if s1 != s2 {
+		t.Fatalf("GoString want %v got %v", s1, s2)
+	}
+	_, err := parser.ParseExpr(s1)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+func TestGetTransferStatusResponseGoString(t *testing.T) {
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
+	p := NewPopulatedGetTransferStatusResponse(popr, false)
 	s1 := p.GoString()
 	s2 := fmt.Sprintf("%#v", p)
 	if s1 != s2 {
@@ -1183,6 +1495,78 @@ func BenchmarkTransferOutResponseSize(b *testing.B) {
 	b.SetBytes(int64(total / b.N))
 }
 
+func TestGetTransferStatusRequestSize(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedGetTransferStatusRequest(popr, true)
+	size2 := proto.Size(p)
+	dAtA, err := proto.Marshal(p)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	size := p.Size()
+	if len(dAtA) != size {
+		t.Errorf("seed = %d, size %v != marshalled size %v", seed, size, len(dAtA))
+	}
+	if size2 != size {
+		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
+	}
+	size3 := proto.Size(p)
+	if size3 != size {
+		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
+	}
+}
+
+func BenchmarkGetTransferStatusRequestSize(b *testing.B) {
+	popr := rand.New(rand.NewSource(616))
+	total := 0
+	pops := make([]*GetTransferStatusRequest, 1000)
+	for i := 0; i < 1000; i++ {
+		pops[i] = NewPopulatedGetTransferStatusRequest(popr, false)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		total += pops[i%1000].Size()
+	}
+	b.SetBytes(int64(total / b.N))
+}
+
+func TestGetTransferStatusResponseSize(t *testing.T) {
+	seed := time.Now().UnixNano()
+	popr := rand.New(rand.NewSource(seed))
+	p := NewPopulatedGetTransferStatusResponse(popr, true)
+	size2 := proto.Size(p)
+	dAtA, err := proto.Marshal(p)
+	if err != nil {
+		t.Fatalf("seed = %d, err = %v", seed, err)
+	}
+	size := p.Size()
+	if len(dAtA) != size {
+		t.Errorf("seed = %d, size %v != marshalled size %v", seed, size, len(dAtA))
+	}
+	if size2 != size {
+		t.Errorf("seed = %d, size %v != before marshal proto.Size %v", seed, size, size2)
+	}
+	size3 := proto.Size(p)
+	if size3 != size {
+		t.Errorf("seed = %d, size %v != after marshal proto.Size %v", seed, size, size3)
+	}
+}
+
+func BenchmarkGetTransferStatusResponseSize(b *testing.B) {
+	popr := rand.New(rand.NewSource(616))
+	total := 0
+	pops := make([]*GetTransferStatusResponse, 1000)
+	for i := 0; i < 1000; i++ {
+		pops[i] = NewPopulatedGetTransferStatusResponse(popr, false)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		total += pops[i%1000].Size()
+	}
+	b.SetBytes(int64(total / b.N))
+}
+
 func TestHealthCheckRequestStringer(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedHealthCheckRequest(popr, false)
@@ -1231,6 +1615,24 @@ func TestTransferOutRequestStringer(t *testing.T) {
 func TestTransferOutResponseStringer(t *testing.T) {
 	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
 	p := NewPopulatedTransferOutResponse(popr, false)
+	s1 := p.String()
+	s2 := fmt.Sprintf("%v", p)
+	if s1 != s2 {
+		t.Fatalf("String want %v got %v", s1, s2)
+	}
+}
+func TestGetTransferStatusRequestStringer(t *testing.T) {
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
+	p := NewPopulatedGetTransferStatusRequest(popr, false)
+	s1 := p.String()
+	s2 := fmt.Sprintf("%v", p)
+	if s1 != s2 {
+		t.Fatalf("String want %v got %v", s1, s2)
+	}
+}
+func TestGetTransferStatusResponseStringer(t *testing.T) {
+	popr := rand.New(rand.NewSource(time.Now().UnixNano()))
+	p := NewPopulatedGetTransferStatusResponse(popr, false)
 	s1 := p.String()
 	s2 := fmt.Sprintf("%v", p)
 	if s1 != s2 {

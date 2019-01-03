@@ -2,29 +2,33 @@ package transfer
 
 import (
 	"context"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
+	"strings"
+	"time"
+
+	pb "git.cochain.io/cochain/chains/service/eos"
 	"github.com/GXK666/eosTransfer/log"
 	"github.com/GXK666/eosTransfer/service/general"
-	eos "github.com/eoscanada/eos-go"
-	system "github.com/eoscanada/eos-go/system"
-	token "github.com/eoscanada/eos-go/token"
+	"github.com/eoscanada/eos-go"
+	"github.com/eoscanada/eos-go/system"
+	"github.com/eoscanada/eos-go/token"
 	"github.com/satori/go.uuid"
 	"github.com/spf13/viper"
-	"strings"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 var Server general.ServiceServer
 
 type Service struct {
 	general.BaseService
-	*eos.API
+	client pb.EosServiceClient
+	keyBag *eos.KeyBag
 }
 
 func Setup() {
-	nodeUrl := viper.GetString("eosNodeUrl")
-	if len(nodeUrl) == 0 {
-		panic("node Url is null")
-	}
 	pivKey := viper.GetString("eosPrivateKeys")
 	pivKeys := strings.Split(pivKey, ",")
 	if len(pivKeys) == 0 {
@@ -32,7 +36,6 @@ func Setup() {
 	}
 
 	signer := eos.NewKeyBag()
-
 	for _, k := range pivKeys {
 		err := signer.ImportPrivateKey(k)
 		if nil != err {
@@ -40,11 +43,71 @@ func Setup() {
 		}
 	}
 
-	api := eos.New(nodeUrl)
-	api.SetSigner(signer)
-	Server = &Service{
-		API: api,
+	cfg := viper.Sub("chainsRpc")
+	creds, err := credentials.NewClientTLSFromFile(cfg.GetString("pemfile"), cfg.GetString("endpoint"))
+	if err != nil {
+		log.Errorw("credentials.NewClientTLSFromFile")
+		panic("chains credentials.NewClientTLSFromFile")
 	}
+	conn, err := grpc.Dial(cfg.GetString("endpoint"), grpc.WithTransportCredentials(creds))
+	if err != nil {
+		log.Errorw("HotWalletTransferOut()  grpc.Dial", "err", err)
+		panic(err)
+	}
+	//defer conn.Close()
+	client := pb.NewEosServiceClient(conn)
+
+	Server = &Service{
+		keyBag: signer,
+		client: client,
+	}
+}
+
+func (s *Service) SignPushActions(ctx context.Context, actions ...*eos.Action) (txid *string, err error) {
+	ctxGetInfo, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	opts := &eos.TxOptions{}
+	if rsp, err := s.client.GetInfo(ctxGetInfo, &pb.GetInfoRequest{}); err != nil {
+		log.Errorw("rpc GetInfo ", "err", err)
+		return nil, err
+	} else {
+		opts.ChainID, _ = hex.DecodeString(rsp.ChainId)
+		opts.HeadBlockID, _ = hex.DecodeString(rsp.HeadBlockId)
+	}
+
+	tx := eos.NewTransaction(actions, opts)
+	stx := eos.NewSignedTransaction(tx)
+
+	pubKeys, err := s.keyBag.AvailableKeys()
+	if nil != err {
+		log.Errorw("keyBag.AvailableKeys ", "err", err)
+		return nil, fmt.Errorf("%#v", err)
+	}
+	var pack *eos.PackedTransaction
+	if signedTx, err := s.keyBag.Sign(stx, opts.ChainID, pubKeys...); nil != err {
+		log.Errorw("keyBag.Sign", "err", err)
+		return nil, fmt.Errorf("%#v", err)
+	} else {
+		if packed, err := signedTx.Pack(eos.CompressionNone); nil != err { // TODO: eos-go, CompressionZlib unpack error
+			log.Errorw("signedTx.Pack", "err", err)
+			return nil, fmt.Errorf("%#v", err)
+		} else {
+			pack = packed
+		}
+	}
+	txByte, err := json.Marshal(pack)
+	if err != nil {
+		log.Errorw("json.Marshal", "data", pack)
+		return nil, err
+	}
+	if rsp, err := s.client.SendTransaction(ctx, &pb.SendTransactionRequest{Tx: string(txByte)}); err != nil {
+		log.Errorw("rpc SendTransaction ", "err", err)
+		return nil, err
+	} else {
+		return &rsp.TxId, nil
+	}
+
+	return nil, nil
 }
 
 func (s *Service) TransferOut(ctx context.Context, req *general.TransferOutRequest) (*general.TransferOutResponse, error) {
@@ -53,7 +116,7 @@ func (s *Service) TransferOut(ctx context.Context, req *general.TransferOutReque
 		return nil, fmt.Errorf("asset error : %#v", err)
 	}
 	nonce, _ := uuid.NewV4()
-	rsp, err := s.SignPushActions(&eos.Action{
+	txid, err := s.SignPushActions(ctx, &eos.Action{
 		Account: eos.AN(req.Contract),
 		Name:    eos.ActN("transfer"),
 		Authorization: []eos.PermissionLevel{
@@ -67,15 +130,41 @@ func (s *Service) TransferOut(ctx context.Context, req *general.TransferOutReque
 		}),
 	}, system.NewNonce(nonce.String()))
 
-	if nil != err {
-		log.Error("transfer %#v, rsp error :%v", req, err)
-		return nil, fmt.Errorf("rsp error :%v", err)
-	}
-	if rsp.StatusCode != "" {
-		log.Error("transfer %#v, rsp : %#v", req, rsp)
-		return nil, fmt.Errorf("rsp : %#v", rsp)
+	if nil != err || txid == nil || len(*txid) != 64 {
+		log.Errorf("transfer %#v, txid %#v,  error :%v", req, txid, err)
+		return nil, fmt.Errorf("txid %#v, rsp error :%v", txid, err)
 	}
 
-	log.Info("transfer %#v, success , %s", req, rsp.TransactionID)
-	return &general.TransferOutResponse{Txid: rsp.TransactionID}, nil
+	log.Info("transfer %#v, success , %s", req, *txid)
+	return &general.TransferOutResponse{Txid: *txid}, nil
+}
+
+func (s *Service) GetTransferStatus(ctx context.Context, req *general.GetTransferStatusRequest) (*general.GetTransferStatusResponse, error) {
+	rsp, err := s.client.GetTransactions(ctx, &pb.GetTransactionsRequest{Id: req.Txid})
+	if nil != err {
+		log.Errorf("GetTransactions txid %s, err %v", req.Txid, err)
+		return nil, fmt.Errorf("GetTransactions txid %s, err %v", req.Txid, err)
+	}
+	if len(rsp.Transactions) != 1 {
+		log.Errorf("Transactions not 1")
+		return nil, fmt.Errorf("Transactions not 1")
+	}
+	tx := rsp.Transactions[0]
+
+	info, err := s.client.GetInfo(ctx, &pb.GetInfoRequest{})
+	if nil != err {
+		log.Errorf("get chain info %#v", err)
+		return nil, fmt.Errorf("get chain info %#v", err)
+	}
+
+	blocks, err := s.client.GetBlocks(ctx, &pb.GetBlocksRequest{Id: tx.BlockId})
+	if nil != err {
+		log.Errorf("GetBlocks, err: %#v", err)
+		return nil, fmt.Errorf("GetBlocks, err: %#v", err)
+	}
+	if len(blocks.Blocks) == 1 && blocks.Blocks[0].Num <= info.LastIrreversibleBlockNum {
+		return &general.GetTransferStatusResponse{Status: "irreversible"}, nil
+	}
+
+	return &general.GetTransferStatusResponse{Status: tx.Status}, nil
 }

@@ -6,18 +6,18 @@ import (
 )
 
 const (
-	_                                               = iota
-	CodeExistingName                     codes.Code = 10000 + iota // 10000+1
-	CodeNonexistentName                                            // +2
-	CodeInvalidName                                                // +3
+	_                              = iota
+	CodeExistingName    codes.Code = 10000 + iota // 10000+1
+	CodeNonexistentName                           // +2
+	CodeInvalidName                               // +3
 	CodeNotImplemented
 	CodeInvalidKey
 )
 
 var (
-	ErrInvalidName                      = statusError(CodeInvalidName, "invalid account name")
-	ErrInvalidKey                       = statusError(CodeInvalidKey, "invalid public key")
-	ErrNotImplemented                   = statusError(CodeNotImplemented, "not implemented")
+	ErrInvalidName    = statusError(CodeInvalidName, "invalid account name")
+	ErrInvalidKey     = statusError(CodeInvalidKey, "invalid public key")
+	ErrNotImplemented = statusError(CodeNotImplemented, "not implemented")
 )
 
 func statusError(code codes.Code, msg string) error {

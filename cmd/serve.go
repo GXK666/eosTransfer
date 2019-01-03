@@ -15,10 +15,10 @@
 package cmd
 
 import (
-	"github.com/GXK666/eosTransfer/transfer"
-	"github.com/spf13/cobra"
 	"github.com/GXK666/eosTransfer/log"
 	"github.com/GXK666/eosTransfer/service"
+	"github.com/GXK666/eosTransfer/transfer"
+	"github.com/spf13/cobra"
 )
 
 // serveCmd represents the serve command
