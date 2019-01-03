@@ -3,7 +3,8 @@
 *.dll
 *.so
 *.dylib
-
+eosTransfer.yml
+eosTransfer
 # Test binary, build with `go test -c`
 *.test
 

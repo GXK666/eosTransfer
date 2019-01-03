@@ -1,0 +1,18 @@
+rpc:
+  addr: 0.0.0.0:8123
+  tls:
+    certFile: /etc/cochain/eosTransfer/certs/server.pem
+    keyFile: /etc/cochain/eosTransfer/certs/server.key
+  logLevel: 2 # grpc `errorLog`
+
+log:
+  level: debug # option: debug, info, warn, error
+  disableStacktrace: true
+
+
+eosPrivateKeys: ""  # "key1,key2,key3"
+
+
+chainsRpc:
+  endpoint: 127.0.0.1:8443
+  pemfile: /etc/cochain/chains/certs/chains_server.pem

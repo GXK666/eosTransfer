@@ -12,6 +12,7 @@ import (
 	"github.com/GXK666/eosTransfer/log"
 	"github.com/GXK666/eosTransfer/service/general"
 	"github.com/eoscanada/eos-go"
+	"github.com/eoscanada/eos-go/ecc"
 	"github.com/eoscanada/eos-go/system"
 	"github.com/eoscanada/eos-go/token"
 	"github.com/satori/go.uuid"
@@ -88,14 +89,20 @@ func (s *Service) SignPushActions(ctx context.Context, actions ...*eos.Action) (
 		log.Errorw("keyBag.Sign", "err", err)
 		return nil, fmt.Errorf("%#v", err)
 	} else {
-		if packed, err := signedTx.Pack(eos.CompressionNone); nil != err { // TODO: eos-go, CompressionZlib unpack error
-			log.Errorw("signedTx.Pack", "err", err)
-			return nil, fmt.Errorf("%#v", err)
-		} else {
-			pack = packed
-		}
+		stx = signedTx
 	}
-	txByte, err := json.Marshal(pack)
+
+	var reqBody struct {
+		Transaction     *eos.Transaction `json:"transaction"`
+		ContextFreeData []eos.HexBytes   `json:"context_free_data"`
+
+		Signatures  []ecc.Signature     `json:"signatures"`
+	}
+	reqBody.Transaction = tx
+	reqBody.Signatures = stx.Signatures
+	reqBody.ContextFreeData = stx.ContextFreeData
+
+	txByte, err := json.Marshal(reqBody)
 	if err != nil {
 		log.Errorw("json.Marshal", "data", pack)
 		return nil, err
