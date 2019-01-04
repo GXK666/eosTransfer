@@ -56,6 +56,22 @@
         ]
       }
     },
+    "/v1/pubkeys": {
+      "get": {
+        "operationId": "GetSupportPubKey",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/generalGetSupportPubKeyResponse"
+            }
+          }
+        },
+        "tags": [
+          "Service"
+        ]
+      }
+    },
     "/v1/transfer_out": {
       "post": {
         "operationId": "TransferOut",
@@ -100,6 +116,17 @@
     }
   },
   "definitions": {
+    "generalGetSupportPubKeyResponse": {
+      "type": "object",
+      "properties": {
+        "pubKeys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "generalGetTransferStatusRequest": {
       "type": "object",
       "properties": {

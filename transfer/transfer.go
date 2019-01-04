@@ -185,3 +185,19 @@ func (s *Service) GetTransferStatus(ctx context.Context, req *general.GetTransfe
 		Blockid:  tx.BlockId,
 	}, nil
 }
+
+func (s *Service) GetSupportPubKey(ctx context.Context, req *general.GetSupportPubKeyRequest) (*general.GetSupportPubKeyResponse, error) {
+	ret := []string{}
+	if keys, err := s.keyBag.AvailableKeys(); nil != err {
+		log.Errorf("keyBag.AvailableKeys, error : %#v", err)
+		return nil, err
+	} else {
+		for _, pub := range keys {
+			ret = append(ret, pub.String())
+		}
+	}
+
+	return &general.GetSupportPubKeyResponse{
+		PubKeys: ret,
+	}, nil
+}

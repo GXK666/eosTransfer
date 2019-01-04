@@ -41,6 +41,9 @@ service Service {
     rpc Version(VersionRequest) returns (VersionResponse) {
         option (google.api.http).get = "/v1/version";
     }
+    rpc GetSupportPubKey(GetSupportPubKeyRequest) returns (GetSupportPubKeyResponse) {
+        option (google.api.http).get = "/v1/pubkeys";
+    }
     rpc TransferOut(TransferOutRequest) returns (TransferOutResponse) {
         option (google.api.http) = {
             post: "/v1/transfer_out"
@@ -63,6 +66,11 @@ message HealthCheckResponse {
 message VersionRequest {}
 message VersionResponse {
     string version = 1;
+}
+
+message GetSupportPubKeyRequest {}
+message GetSupportPubKeyResponse {
+    repeated string pubKeys = 1;
 }
 
 message TransferOutRequest{
