@@ -1,0 +1,9 @@
+[Unit]
+Description=Run cochain eosTransfer service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/eosTransfer serve --config /etc/cochain/eosTransfer/eosTransfer.yml
+Type=simple
+Restart=always
+RestartSec=1
