@@ -96,7 +96,7 @@ func (s *Service) SignPushActions(ctx context.Context, actions ...*eos.Action) (
 		Transaction     *eos.Transaction `json:"transaction"`
 		ContextFreeData []eos.HexBytes   `json:"context_free_data"`
 
-		Signatures  []ecc.Signature     `json:"signatures"`
+		Signatures []ecc.Signature `json:"signatures"`
 	}
 	reqBody.Transaction = tx
 	reqBody.Signatures = stx.Signatures
@@ -170,8 +170,18 @@ func (s *Service) GetTransferStatus(ctx context.Context, req *general.GetTransfe
 		return nil, fmt.Errorf("GetBlocks, err: %#v", err)
 	}
 	if len(blocks.Blocks) == 1 && blocks.Blocks[0].Num <= info.LastIrreversibleBlockNum {
-		return &general.GetTransferStatusResponse{Status: "irreversible"}, nil
+		return &general.GetTransferStatusResponse{
+			Status:   "irreversible",
+			Txid:     tx.Id,
+			BlockNum: tx.BlockNum,
+			Blockid:  tx.BlockId,
+		}, nil
 	}
 
-	return &general.GetTransferStatusResponse{Status: tx.Status}, nil
+	return &general.GetTransferStatusResponse{
+		Status:   tx.Status,
+		Txid:     tx.Id,
+		BlockNum: tx.BlockNum,
+		Blockid:  tx.BlockId,
+	}, nil
 }

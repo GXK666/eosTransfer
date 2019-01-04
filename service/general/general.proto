@@ -81,5 +81,8 @@ message GetTransferStatusRequest{
 }
 
 message GetTransferStatusResponse{
-    string status = 1;
+    string txid = 1;
+    string status = 2;
+    uint32 blockNum = 3;
+    string blockid = 4;
 }

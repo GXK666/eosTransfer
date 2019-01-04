@@ -111,7 +111,17 @@
     "generalGetTransferStatusResponse": {
       "type": "object",
       "properties": {
+        "txid": {
+          "type": "string"
+        },
         "status": {
+          "type": "string"
+        },
+        "blockNum": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "blockid": {
           "type": "string"
         }
       }
