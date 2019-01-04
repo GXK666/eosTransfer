@@ -142,7 +142,7 @@ func (s *Service) TransferOut(ctx context.Context, req *general.TransferOutReque
 		return nil, fmt.Errorf("txid %#v, rsp error :%v", txid, err)
 	}
 
-	log.Info("transfer %#v, success , %s", req, *txid)
+	log.Infof("transfer %#v, success , %s", req, *txid)
 	return &general.TransferOutResponse{Txid: *txid}, nil
 }
 
