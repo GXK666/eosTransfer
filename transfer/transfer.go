@@ -118,6 +118,8 @@ func (s *Service) SignPushActions(ctx context.Context, actions ...*eos.Action) (
 }
 
 func (s *Service) TransferOut(ctx context.Context, req *general.TransferOutRequest) (*general.TransferOutResponse, error) {
+	fromAccount := viper.GetString("eosFromAccount")
+	log.Infof("TransferOut start fromAccount: %s, req: %#v", fromAccount, req)
 	amount, err := eos.NewAsset(req.Amount)
 	if err != err {
 		return nil, fmt.Errorf("asset error : %#v", err)
@@ -127,10 +129,10 @@ func (s *Service) TransferOut(ctx context.Context, req *general.TransferOutReque
 		Account: eos.AN(req.Contract),
 		Name:    eos.ActN("transfer"),
 		Authorization: []eos.PermissionLevel{
-			{Actor: eos.AN(req.From), Permission: eos.PN("active")},
+			{Actor: eos.AN(fromAccount), Permission: eos.PN("active")},
 		},
 		ActionData: eos.NewActionData(token.Transfer{
-			From:     eos.AN(req.From),
+			From:     eos.AN(fromAccount),
 			To:       eos.AN(req.To),
 			Quantity: amount,
 			Memo:     req.Memo,
@@ -142,7 +144,7 @@ func (s *Service) TransferOut(ctx context.Context, req *general.TransferOutReque
 		return nil, fmt.Errorf("txid %#v, rsp error :%v", txid, err)
 	}
 
-	log.Infof("transfer %#v, success , %s", req, *txid)
+	log.Infof("TransferOut end %#v, success , %s", req, *txid)
 	return &general.TransferOutResponse{Txid: *txid}, nil
 }
 

@@ -75,10 +75,10 @@ message GetSupportPubKeyResponse {
 
 message TransferOutRequest{
     string contract = 1;
-    string from = 2;
-    string to = 3;
-    string amount = 4;
-    string memo = 5;
+    string to = 2;
+    string amount = 3;
+    string memo = 4;
+    string request_id = 5;  // write log
 }
 message TransferOutResponse{
     string txid = 1;
