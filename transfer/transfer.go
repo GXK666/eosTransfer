@@ -122,6 +122,7 @@ func (s *Service) TransferOut(ctx context.Context, req *general.TransferOutReque
 	log.Infof("TransferOut start fromAccount: %s, req: %#v", fromAccount, req)
 	amount, err := eos.NewAsset(req.Amount)
 	if err != err {
+		log.Errorf("TransferOut err, req: %#v  ,asset error : %#v", req, err)
 		return nil, fmt.Errorf("asset error : %#v", err)
 	}
 	nonce, _ := uuid.NewV4()
@@ -140,7 +141,7 @@ func (s *Service) TransferOut(ctx context.Context, req *general.TransferOutReque
 	}, system.NewNonce(nonce.String()))
 
 	if nil != err || txid == nil || len(*txid) != 64 {
-		log.Errorf("transfer %#v, txid %#v,  error :%v", req, txid, err)
+		log.Errorf("TransferOut req: %#v, txid %#v,  error :%v", req, txid, err)
 		return nil, fmt.Errorf("txid %#v, rsp error :%v", txid, err)
 	}
 
