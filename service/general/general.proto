@@ -4,7 +4,7 @@ package general;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "google/protobuf/timestamp.proto";
+//import "google/protobuf/timestamp.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
@@ -56,6 +56,9 @@ service Service {
             body: '*'
         };
     }
+    rpc CheckAccountExist(CheckAccountRequest) returns (CheckAccountResponse) {
+        option (google.api.http).get = "/v1/account/exist";
+    }
 }
 
 message HealthCheckRequest {
@@ -93,4 +96,12 @@ message GetTransferStatusResponse{
     string status = 2;
     uint32 blockNum = 3;
     string blockid = 4;
+}
+
+message CheckAccountRequest {
+    string account = 1;
+}
+
+message CheckAccountResponse {
+    bool exist = 1;
 }

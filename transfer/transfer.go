@@ -204,3 +204,14 @@ func (s *Service) GetSupportPubKey(ctx context.Context, req *general.GetSupportP
 		PubKeys: ret,
 	}, nil
 }
+
+func (s *Service) CheckAccountExist(ctx context.Context, req *general.CheckAccountRequest) (*general.CheckAccountResponse, error) {
+	rsp, err := s.client.GetAccount(ctx, &pb.GetAccountRequest{Account: req.Account})
+	if nil != err {
+		log.Errorf("CheckAccountExist txid %s, err %v", req.Account, err)
+		return nil, fmt.Errorf("CheckAccountExist txid %s, err %v", req.Account, err)
+	}
+
+	exits := rsp.AccountName == req.Account
+	return &general.CheckAccountResponse{Exist: exits}, nil
+}

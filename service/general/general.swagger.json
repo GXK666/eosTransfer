@@ -14,12 +14,36 @@
     "application/json"
   ],
   "paths": {
+    "/v1/account/exist": {
+      "get": {
+        "operationId": "CheckAccountExist",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/generalCheckAccountResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "account",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Service"
+        ]
+      }
+    },
     "/v1/get_transfer": {
       "post": {
         "operationId": "GetTransferStatus",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/generalGetTransferStatusResponse"
             }
@@ -45,7 +69,7 @@
         "operationId": "HealthCheck",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/generalHealthCheckResponse"
             }
@@ -61,7 +85,7 @@
         "operationId": "GetSupportPubKey",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/generalGetSupportPubKeyResponse"
             }
@@ -77,7 +101,7 @@
         "operationId": "TransferOut",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/generalTransferOutResponse"
             }
@@ -103,7 +127,7 @@
         "operationId": "Version",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/generalVersionResponse"
             }
@@ -116,6 +140,15 @@
     }
   },
   "definitions": {
+    "generalCheckAccountResponse": {
+      "type": "object",
+      "properties": {
+        "exist": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
     "generalGetSupportPubKeyResponse": {
       "type": "object",
       "properties": {
