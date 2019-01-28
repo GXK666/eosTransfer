@@ -7,7 +7,6 @@ import (
 	"github.com/GXK666/eosTransfer/service/general"
 	"github.com/GXK666/eosTransfer/transfer"
 
-	"crypto/tls"
 	"net"
 
 	"context"
@@ -18,7 +17,6 @@ import (
 	"github.com/kazegusuri/grpc-panic-handler"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 func Serve() {
@@ -42,14 +40,8 @@ func Serve() {
 	if parts[0] == "0.0.0.0" {
 		endpoint = "127.0.0.1:" + parts[1]
 	}
-	certFile := viper.GetString("rpc.tls.certFile")
-	keyFile := viper.GetString("rpc.tls.keyFile")
 
-	dialCreds, err := credentials.NewClientTLSFromFile(certFile, endpoint)
-	if err != nil {
-		panic(err)
-	}
-	dialOpts := []grpc.DialOption{grpc.WithTransportCredentials(dialCreds)}
+	dialOpts := []grpc.DialOption{grpc.WithInsecure()}
 	jsonpb := &gateway.JSONPb{
 		EmitDefaults: true,
 		Indent:       "  ",
@@ -63,7 +55,7 @@ func Serve() {
 	)
 	go func() {
 		time.Sleep(time.Second) // Avoid immediate connection failure
-		err = general.RegisterServiceHandlerFromEndpoint(context.Background(), gwmux, endpoint, dialOpts)
+		err := general.RegisterServiceHandlerFromEndpoint(context.Background(), gwmux, endpoint, dialOpts)
 		if err != nil {
 			panic(err)
 		}
@@ -78,24 +70,16 @@ func Serve() {
 		}
 	})
 
-	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
-	if err != nil {
-		panic(err)
-	}
 	srv := &http.Server{
 		Addr:    addr,
 		Handler: handler,
-		TLSConfig: &tls.Config{
-			Certificates: []tls.Certificate{cert},
-			NextProtos:   []string{"h2"},
-		},
 	}
 
 	conn, err := net.Listen("tcp", addr)
 	if err != nil {
 		panic(err)
 	}
-	err = srv.Serve(tls.NewListener(conn, srv.TLSConfig))
+	err = srv.Serve(conn)
 	if err != nil {
 		panic(err)
 	}
