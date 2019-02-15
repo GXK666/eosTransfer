@@ -12,10 +12,10 @@ post   /v1/transfer_out
 
 {
   "contract":"eosio.token",  # 转eos代币，则此参数为eosio.token
-  "from":"accountA",
   "to:"accountB",
   "amount":"1.0000 EOS",     # 代币标准格式
   "memo": "memo"
+  "request_id":"uuid"
 }
 
 
