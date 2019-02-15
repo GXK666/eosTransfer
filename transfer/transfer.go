@@ -155,9 +155,12 @@ func (s *Service) GetTransferStatus(ctx context.Context, req *general.GetTransfe
 		log.Errorf("GetTransactions txid %s, err %v", req.Txid, err)
 		return nil, fmt.Errorf("GetTransactions txid %s, err %v", req.Txid, err)
 	}
-	if len(rsp.Transactions) != 1 {
-		log.Errorf("Transactions not 1")
-		return nil, fmt.Errorf("Transactions not 1")
+	if len(rsp.Transactions) == 0 {
+		log.Errorf("not find transaction")
+		return nil, fmt.Errorf("not find transaction")
+	} else if len(rsp.Transactions) > 1 {
+		log.Errorf("find transactions >  1")
+		return nil, fmt.Errorf("find transactions >  1")
 	}
 	tx := rsp.Transactions[0]
 

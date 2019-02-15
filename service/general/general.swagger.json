@@ -19,7 +19,7 @@
         "operationId": "CheckAccountExist",
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "",
             "schema": {
               "$ref": "#/definitions/generalCheckAccountResponse"
             }
@@ -43,7 +43,7 @@
         "operationId": "GetTransferStatus",
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "",
             "schema": {
               "$ref": "#/definitions/generalGetTransferStatusResponse"
             }
@@ -69,7 +69,7 @@
         "operationId": "HealthCheck",
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "",
             "schema": {
               "$ref": "#/definitions/generalHealthCheckResponse"
             }
@@ -85,7 +85,7 @@
         "operationId": "GetSupportPubKey",
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "",
             "schema": {
               "$ref": "#/definitions/generalGetSupportPubKeyResponse"
             }
@@ -101,7 +101,7 @@
         "operationId": "TransferOut",
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "",
             "schema": {
               "$ref": "#/definitions/generalTransferOutResponse"
             }
@@ -127,7 +127,7 @@
         "operationId": "Version",
         "responses": {
           "200": {
-            "description": "A successful response.",
+            "description": "",
             "schema": {
               "$ref": "#/definitions/generalVersionResponse"
             }
